@@ -11,7 +11,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 
-// icons 
+// icons
 import ForumIcon from '@material-ui/icons/Forum';
 import WorkIcon from '@material-ui/icons/Work';
 import BuildIcon from '@material-ui/icons/Build';
@@ -37,6 +37,14 @@ import InputBase from '@material-ui/core/InputBase';
 import Button from '@material-ui/core/Button';
 import Axios from 'axios';
 import Grid from "@material-ui/core/Grid";
+
+// native
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
+import IconButton from '@material-ui/core/IconButton';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+
+
 
 const drawerWidth = 240;
 
@@ -122,6 +130,18 @@ function ClippedDrawer(props) {
 
     const [opsList, setopsList] = useState([]);
 
+    const [anchorEl, setAnchorEl] = React.useState(null);
+
+    const open = Boolean(anchorEl);
+
+    const handleClose = () => {
+        setAnchorEl(null);
+      };
+
+      const handleMenu = (event) => {
+        setAnchorEl(event.currentTarget);
+      };
+
     const updateSearchValue = (event) => {
         setSearchValue(event.target.value);
     }
@@ -186,15 +206,16 @@ function ClippedDrawer(props) {
     }, [props.location]);
 
     const ALL_PAGES = [
-        {name: 'Forum', icon: <ForumIcon/>, urlVal: url + '/forums'},
+
         {name: 'Find Jobs', icon: <WorkIcon/>, urlVal: url + '/findjobs'},
         {name: 'Saved Jobs', icon: <WorkIcon/>, urlVal: url + '/savedjobs'},
-        {name: 'Skill Up', icon: <BuildIcon/>, urlVal: url + '/skillup'},
-        {name: 'Meetings Page', icon: <GroupIcon/>, urlVal: url + '/meetings'},
-        {name: 'Create Meeting', icon: <GroupIcon/>, urlVal: url + '/addMeeting'},
         {name: 'Find Projects', icon: <AssessmentIcon/>, urlVal: url + '/findprojects'},
         {name: 'Add Project', icon: <AssessmentIcon/>, urlVal: url + '/addproject'},
-        {name: 'My Profile', icon: <AccountBoxIcon/>, urlVal: url + '/profile'}
+        {name: 'Skill Up', icon: <BuildIcon/>, urlVal: url + '/skillup'},
+        {name: 'Scheduled Meetings', icon: <GroupIcon/>, urlVal: url + '/meetings'},
+        {name: 'Create Meeting', icon: <GroupIcon/>, urlVal: url + '/addMeeting'},
+        {name: 'Forum', icon: <ForumIcon/>, urlVal: url + '/forums'},
+        // {name: 'My Profile', icon: <AccountBoxIcon/>, urlVal: url + '/profile'}
 
     ];
 
@@ -203,11 +224,7 @@ function ClippedDrawer(props) {
             <CssBaseline/>
             <AppBar position="fixed" className={classes.appBar}>
                 <Toolbar>
-                    <Grid
-                        justify="space-between"
-                        container
-                        spacing={24}
-                    >
+                   
                         <Typography variant="h6" noWrap>
                             Brighter Bee
                         </Typography>
@@ -226,12 +243,44 @@ function ClippedDrawer(props) {
                                 onKeyUp={updateSearchValue}
                             />
                         </div>}
-                        {showSearch && <Button onClick={getJobs} className={classes.searchBtn}>Search</Button>}
 
-                        <Button variant="contained" color="secondary" onClick={logout}>
-                            {localStorage.getItem("user") ? 'Log out' : 'Log in'}
-                        </Button>
-                    </Grid>
+                        {showSearch && <Button onClick={getJobs} className={classes.searchBtn}>Search</Button>}
+                        <div style={{position:"absolute",right:'1rem'}}>
+              <IconButton
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={open}
+                onClose={handleClose}
+              >
+                <MenuItem href={url + '/profile'}>Profile</MenuItem>
+                <MenuItem onClick={logout}>{localStorage.getItem("user") ? 'Logout' : 'Login'}</MenuItem>
+              </Menu>
+            </div>
+                        {/* <span>
+                            <Button variant="contained"  className={classes.searchBtn} href={url + '/profile'}>My Profile</Button>
+                            <Button variant="contained"  className={classes.searchBtn} onClick={logout}>
+                                {localStorage.getItem("user") ? 'Logout' : 'Login'}
+                            </Button>
+                        </span> */}
+
                 </Toolbar>
             </AppBar>
             <Drawer
