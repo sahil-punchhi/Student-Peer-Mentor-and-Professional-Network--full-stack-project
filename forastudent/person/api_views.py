@@ -12,21 +12,74 @@ from collections import defaultdict
 from .createMeeting import createMeeting, getMeeting
 from django.http import HttpResponse
 import json
+from rest_framework import generics
+from rest_framework import viewsets
+import django_filters
 
-flag = True
+
+class InListFilter(django_filters.Filter):
+    def filter(self, qs, value):
+        if value:
+            return qs.filter(**{self.field_name+'__in': value.split(',')})
+        return qs
+
+
+class MultiIdFilterSet(django_filters.FilterSet):
+    id = InListFilter(field_name='id')
+
+
+class OpportunityViewSet(viewsets.ModelViewSet):
+    queryset = Opportunity.objects.all()
+    serializer_class = OpportunitySerializer
+    filter_class = MultiIdFilterSet
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('id', )
+
+
+class ProjectViewSet(viewsets.ModelViewSet):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    search_fields = ('name',)
+    filter_fields = ('id',)
+
+
+class SkillViewSet(viewsets.ModelViewSet):
+    queryset = Skill.objects.all()
+    serializer_class = SkillSerializer
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    search_fields = ('name', )
+    filter_fields = ('id', )
+
 
 class GeneralPagination(LimitOffsetPagination):
     default_limit = 5
     max_limit = 10
 
 
+class UserList(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    filter_backends = (DjangoFilterBackend, )
+    filter_fields = ('username', )
+
+
 class PersonList(ListAPIView):
     queryset = Person.objects.all()
     serializer_class = PersonSerializer
     filter_backends = (DjangoFilterBackend, SearchFilter)
-    filter_fields = ('type', 'location')
+    filter_fields = ('type', 'location', 'user')
     search_fields = ('name',)
-    pagination_class = GeneralPagination
+
+
+class PersonCreate(CreateAPIView):
+    serializer_class = PersonSerializer
+
+
+class PersonRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
+    queryset = Person.objects.all()
+    lookup_field = 'id'
+    serializer_class = PersonSerializer
 
 
 class MeetingList(ListAPIView):
@@ -35,7 +88,7 @@ class MeetingList(ListAPIView):
     filter_backends = (DjangoFilterBackend, SearchFilter)
     filter_fields = ('id', 'number', 'participants', 'time')
     search_fields = ('name',)
-    pagination_class = GeneralPagination
+   # pagination_class = GeneralPagination
 
 
 user_skill_dict = defaultdict(list)
@@ -95,6 +148,7 @@ class MeetingCreate(CreateAPIView):
         #     raise ValidationError({'time': 'Must be in the future'})
         #
         return super().create(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         request_string = request.read().decode('utf-8')
         request_obj = json.loads(request_string)
@@ -116,26 +170,46 @@ class MeetingCreate(CreateAPIView):
         response = HttpResponse(getMeeting(meeting_id))   
         return response
 
+
 class MeetingRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
     queryset = Meeting.objects.all()
     lookup_field = 'id'
     serializer_class = MeetingSerializer
-
-    def delete(self, request, *args, **kwargs):
-        mid = request.data.get('id')
-        response = super().delete(request, *args, **kwargs)
-        if response.status_code == 204:
-            cache.delete(f'meeting_data_{mid}')
+    def get(self, request, id):
+        print(id)
+        m = Meeting.objects.get(pk=int(id))
+        response = super().get(request, id)
+        response.data["url"] = getMeeting(m.number)
         return response
 
-    def update(self, request, *args, **kwargs):
-        response = super().update(request, *args, **kwargs)
-        if response.status_code == 200:
-            meeting = response.data
-            cache.set(f"meeting_data_{meeting['id']}", {
-                'name': meeting['name'],
-                'time': meeting['time'],
-                'number': meeting['number'],
-                'participants': meeting['participants'],
-            })
-        return response
+
+class SkillList(ListAPIView):
+    queryset = Skill.objects.all()
+    serializer_class = SkillSerializer
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    filter_fields = ('id', )
+    search_fields = ('name',)
+
+
+class OpportunityList(ListAPIView):
+    queryset = Opportunity.objects.all()
+    serializer_class = OpportunitySerializer
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    filter_fields = ('id', 'person')
+    search_fields = ('name',)
+
+
+# class SkillRecommendList(generics.ListAPIView):
+#
+#     serializer_class = SkillRecommendSerializer
+#
+#     def get_queryset(self):
+#         """
+#         Optionally restricts the returned recommended skill to a given id,
+#         by filtering against a `q` query parameter in the URL.
+#         """
+#         queryset = Person.objects.all()
+#         my_id = self.request.query_params.get('q', None)
+#         if my_id is not None:
+#             queryset = queryset.filter(id=my_id)
+#         return queryset

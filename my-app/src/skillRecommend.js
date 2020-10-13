@@ -4,6 +4,8 @@ import Typography from '@material-ui/core/Typography';
 import Button from "@material-ui/core/Button";
 import axios from 'axios';
 
+var  flag = false // console.log flag
+
 const useStyles = theme => ({
   root: {
     display: 'flex',
@@ -45,27 +47,28 @@ const WelcomeText = props => {
   );
 }
 
-const CourseButton = props => {
-  return (
-    <div style={{fontFamily: 'Roboto'}}>
-      <Button onClick={props.addCourse} variant="contained" color="primary">
-        WHERE CAN I LEARN THIS SKILL?
-      </Button>
-    </div>
-  );
-};
+// const CourseButton = props => {
+//   return (
+//     <div style={{fontFamily: 'Roboto'}}>
+//       <Button onClick={props.addCourse} variant="contained" color="primary">
+//         WHERE CAN I LEARN THIS SKILL?
+//       </Button>
+//     </div>
+//   );
+// };
 
 class Skill extends React.Component {
   constructor(props) {
       super(props);
 
       // this.state = {
-      //     username: this.props.match.params.username
+      //     person_id: this.props.match.params.person_id
       //   };
       this.state = {
           userData:{
-              username: "1",
-              skill: "",
+              person_id: localStorage.getItem('user'),
+              recommended_skill: "",
+              course_list: [],
           }
         }
       }
@@ -75,60 +78,53 @@ class Skill extends React.Component {
       }
 
       async getSkills() {
-          await axios.get('http://localhost:8000/personskill/' + this.state.userData.username)
+          await axios.get('http://localhost:8000/skill-recommend/' + this.state.userData.person_id) //if by flask
+          //await axios.get('http://localhost:8000/my-skill-recommend?q=' + this.state.userData.person_id) // if by django api view
           .then(response => {
-              console.log(response)
+              if (flag) {
+                console.log(response)}
               this.setState({
                 userData:{
-                    username: "sahil.punchhi",
-                    skill: response.data.results[0].skills,
+                    recommended_skill: response.data.recommended_skill,// if by flask
+                    //recommended_skill: response.data[0].recommended_skill, // if by django api view
+                    course_list: response.data.course_list,
                 }
               })
-              console.log(this.state.userData.skill)
+              if (flag) {
+                console.log(this.state.userData.recommended_skill)}
           })
           .catch(error => {
               console.log(error)
           });
       }
 
-      // async getSkills2() {
-      //     axios.post('http://localhost:8000/personskill2/' , {
-      //        'user': this.state.userData.id
-      //      })
-      //     .then(response => {
-      //         console.log(response)
-      //         this.setState({
-      //           userData:{
-      //               id: "1",
-      //               skill: response.data.results[0].skills,
-      //           }
-      //         })
-      //         console.log(this.state.userData.skill)
-      //     })
-      //     .catch(error => {
-      //         console.log(error)
-      //     });
-      // }
-
   render() {
 
     return (
     <div style={{fontFamily: 'Avenir'}}>
-      <h2>&nbsp; {this.state.userData.skill}</h2>
+      <h2>&nbsp; {this.state.userData.recommended_skill}</h2>
       <br></br>
+      <br></br>
+      <h2 style={{color : '#3f51b5'}}>Recommended courses to learn this skill:</h2>
+      {this.state.userData.course_list.map((item, index) => (
+        <div>
+          <h3>&nbsp; {item.course_name} &nbsp; <a href={item.course_link}>course link</a></h3>
+        </div>
+      ))}
+
 
     </div>);
   }
 };
 
-class Course extends React.Component {
-  render() {
-    return (
-    <div style={{fontFamily: 'Avenir'}}>
-      <h2>&nbsp; Lynda.com</h2>
-    </div>);
-  }
-};
+// class Course extends React.Component {
+//   render() {
+//     return (
+//     <div style={{fontFamily: 'Avenir'}}>
+//       <h2>&nbsp; Lynda.com</h2>
+//     </div>);
+//   }
+// };
 
 class SkillRecommend extends React.Component {
   constructor(props) {
@@ -160,11 +156,12 @@ class SkillRecommend extends React.Component {
         <div>
           {<WelcomeText addSkill={this.triggerAddSkillState} />}
           {this.state.isAddSkillState && <Skill />}
-          {this.state.isAddSkillState && <CourseButton addCourse={this.triggerAddCourseState} />}
-          {this.state.isAddCourseState && <Course />}
         </div>
+          // {this.state.isAddSkillState && <CourseButton addCourse={this.triggerAddCourseState} />}
+          // {this.state.isAddCourseState && <Course />}
 
-      
+
+
   );
 }
 }

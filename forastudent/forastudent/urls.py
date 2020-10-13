@@ -18,18 +18,37 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 
+from rest_framework import routers
+
 import person.api_views
+import person.views
+import person.skill_view
+import person.project_view
+
+router = routers.DefaultRouter()
+router.register(r'opportunity', person.api_views.OpportunityViewSet)
+router.register(r'project', person.api_views.ProjectViewSet)
+router.register(r'skill', person.api_views.SkillViewSet)
 
 urlpatterns = [
+    # path('api/v2/skills', person.api_views.RecommendSkill.as_view()),
+    # path('project', person.views.get_projects),
+    path('api/', include(router.urls)),
+    path('recommend/<int:person_id>', person.views.recommend_skill),
+    path('api/v2/skills', person.api_views.SkillList.as_view()),
+    path('api/v2/users', person.api_views.UserList.as_view()),
     path('api/v2/persons', person.api_views.PersonList.as_view()),
+    path('api/v2/persons/new', person.api_views.PersonCreate.as_view()),
+    path('api/v2/persons/<int:id>/', person.api_views.PersonRetrieveUpdateDestroy.as_view()),
     path('api/v2/meetings', person.api_views.MeetingList.as_view()),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/v2/meetings/new', person.api_views.MeetingCreate.as_view()),
     path('api/v2/meetings/<int:id>/', person.api_views.MeetingRetrieveUpdateDestroy.as_view()),
     path('api/v2/accounts/', include('rest_registration.api.urls')),
-    path('personskill/<int:id>/', person.api_views.Person_SkillList.as_view()),
-    # path('personskill2', person.api_views.Person_SkillList2.as_view()),
+    path('skill-recommend/<int:person_id>', person.skill_view.recommend_skill),  # flask url for skill recommendation
+    path('project-recommend/<int:person_id>', person.project_view.recommend_project),
+    # path('my-skill-recommend', person.api_views.SkillRecommendList.as_view()), # django url for skill recommendation
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
