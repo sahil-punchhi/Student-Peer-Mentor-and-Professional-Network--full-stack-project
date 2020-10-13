@@ -1,11 +1,11 @@
 import React from 'react';
 import axios from "axios";
-import Grid from '@material-ui/core/Grid';
 import CreatePostDialog from "./post_form";
 import Pagination from "@material-ui/lab/Pagination/Pagination";
 import PostDetailDialog from "./posts_and_detail";
 
 
+// Forum page
 class ForumsPage extends React.Component {
     constructor(props){
         super(props);
@@ -15,10 +15,10 @@ class ForumsPage extends React.Component {
             count: 0,
         };
         this.handlePageChange = this.handlePageChange.bind(this);
-        this.componentDidMount = this.componentDidMount.bind(this);
     }
 
-    componentDidMount () {
+    // GET request for all posts
+    componentDidMount  () {
         axios.get("http://127.0.0.1:8000/forum/", {
             params:{
                 page: this.state.currentPage,
@@ -28,32 +28,31 @@ class ForumsPage extends React.Component {
                 posts: res.data,
                 count: res.data[0].count,
             });
-            console.log(this.state.posts);
         }).catch(err => {
-            console.log(err);
         })
     }
 
+    // event when page changes
     handlePageChange(event, value) {
         this.setState({
             currentPage: value,
         },()=>{
-            this.componentDidMount()
+            this.componentDidMount ()
         }
         )};
 
     render() {
         return (
-            <div>
+            <div style={{overflow:'hidden'}}>
                 <CreatePostDialog />
                 <br/>
                 <PostDetailDialog data={this.state.posts}/>
-                <Grid>
+                <div>
                 <br/>
                     <Pagination count={this.state.count} color="primary" style={{position: 'relative',
                                 left: '65%'}} page={this.state.currentPage} onChange={this.handlePageChange}
                                 showFirstButton showLastButton />
-                </Grid>
+                </div>
             </div>
         );
     }

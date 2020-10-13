@@ -28,7 +28,7 @@ export default function JobCard(props) {
   const classes = useStyles();
   var sanitizeHtml = require('sanitize-html');
 
-  
+
   const handleSaveJob = () =>{
     // add job to opportunity table
     let item = {
@@ -86,17 +86,17 @@ export default function JobCard(props) {
         <Typography className={classes.pos} color="textSecondary">
           {props.location}
         </Typography>
-        <Typography variant="body2" component="p">
+        <Typography variant="body2" component="p" style={{marginLeft: "40px", textAlign: "justify", marginRight: "95px"}}>
           {sanitizeHtml(props.description,{allowedTags:[]})}
         </Typography>
       </CardContent>
       {!props.delete
       ?(<CardActions>
-        <Button variant="contained" color="primary" href={props.url} size="small">Apply</Button>
+        <Button variant="contained" color="primary" href={props.url} target="_blank" size="small">Apply</Button>
         <Button  variant="contained" color="primary" size="small" onClick={handleSaveJob}>Save</Button>
       </CardActions>):
       (<CardActions>
-        <Button variant="contained" color="primary" href={props.url} size="small">Apply</Button>
+        <Button variant="contained" color="primary" href={props.url} target="_blank" size="small">Apply</Button>
         <Button variant="contained" color="secondary" size="small" onClick={handleDelete}>Delete</Button>
       </CardActions>)
       }

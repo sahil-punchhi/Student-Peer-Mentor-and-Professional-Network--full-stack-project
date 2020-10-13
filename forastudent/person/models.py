@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-# Create your models here.
+# Database ORM
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -61,7 +61,7 @@ class Person(models.Model):
     desc = models.TextField(blank=True, null=True)
     location = models.TextField(blank=True, null=True)
     avatar = models.ImageField(upload_to='images/', default='images/avatar.jpg', blank=True, null=True)
-    resume = models.FileField(upload_to='resume/', blank=True, null=True)
+    resume = models.FileField(upload_to='resume/', default='resume/blank.pdf', blank=True, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     skills = models.ManyToManyField(Skill, blank=True)
     opportunities = models.ManyToManyField(Opportunity, blank=True)
@@ -81,6 +81,9 @@ class Meeting(models.Model):
 
     def __str__(self):
         return self.name + " - " + self.number
+
+    class Meta:
+        ordering = ('time', )
 
 
 class Course(models.Model):
@@ -104,19 +107,6 @@ class Project(models.Model):
         return self.name
 
 
-class ForumSection(models.Model):
-    name = models.CharField(max_length=100)
-    desc = models.TextField()
-    order = models.PositiveIntegerField()
-    createdAt = models.DateTimeField(auto_now_add=True)
-    updatedAt = models.DateTimeField(auto_now=True)
-    isDeleted = models.BooleanField(default=False)
-    icon = models.ImageField(upload_to='images/', default='images/avatar.jpg')
-
-    def __str__(self):
-        return "Section: " + self.name
-
-
 class ForumCategory(models.Model):
     name = models.CharField(max_length=100)
     desc = models.TextField()
@@ -124,7 +114,6 @@ class ForumCategory(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
     isDeleted = models.BooleanField(default=False)
-    section = models.ForeignKey(ForumSection, on_delete=models.CASCADE, related_name="BelongsToOneForumSection")
 
     def __str__(self):
         return "Category: " + self.name
@@ -141,8 +130,6 @@ class Post(models.Model):
     updatedAt = models.DateTimeField(auto_now=True)
     isDeleted = models.BooleanField(default=False)
     poster = models.ForeignKey(Person, on_delete=models.CASCADE)
-    # poster = models.ForeignKey(Person, on_delete=models.CASCADE)
-    # category = models.ForeignKey(ForumCategory, on_delete=models.CASCADE, null=True, blank=True, db_column='category_id')
     category = models.ForeignKey(ForumCategory, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):

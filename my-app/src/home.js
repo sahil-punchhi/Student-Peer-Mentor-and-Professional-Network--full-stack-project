@@ -43,6 +43,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import IconButton from '@material-ui/core/IconButton';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import Mentors from "./Mentors";
 
 
 
@@ -189,8 +190,19 @@ function ClippedDrawer(props) {
     }
 
     const logout = () => {
+        // login
+        if (!localStorage.getItem("user")) {
+            document.location = '/';
+            return;
+        }
+
+        // logout
+        let response = window.confirm("Are you sure to logout?");
+        if (response === false) {
+            return;
+        }
+        document.location = '/';
         localStorage.removeItem("user");
-        document.location = '/'
     };
 
     useEffect(() => {
@@ -205,12 +217,14 @@ function ClippedDrawer(props) {
         }
     }, [props.location]);
 
+    // Register routes
     const ALL_PAGES = [
 
         {name: 'Find Jobs', icon: <WorkIcon/>, urlVal: url + '/findjobs'},
         {name: 'Saved Jobs', icon: <WorkIcon/>, urlVal: url + '/savedjobs'},
         {name: 'Find Projects', icon: <AssessmentIcon/>, urlVal: url + '/findprojects'},
         {name: 'Add Project', icon: <AssessmentIcon/>, urlVal: url + '/addproject'},
+        {name: 'Find Mentors', icon: <GroupIcon/>, urlVal: url + '/mentors'},
         {name: 'Skill Up', icon: <BuildIcon/>, urlVal: url + '/skillup'},
         {name: 'Scheduled Meetings', icon: <GroupIcon/>, urlVal: url + '/meetings'},
         {name: 'Create Meeting', icon: <GroupIcon/>, urlVal: url + '/addMeeting'},
@@ -224,7 +238,7 @@ function ClippedDrawer(props) {
             <CssBaseline/>
             <AppBar position="fixed" className={classes.appBar}>
                 <Toolbar>
-                   
+
                         <Typography variant="h6" noWrap>
                             Brighter Bee
                         </Typography>
@@ -270,7 +284,7 @@ function ClippedDrawer(props) {
                 open={open}
                 onClose={handleClose}
               >
-                <MenuItem href={url + '/profile'}>Profile</MenuItem>
+                <MenuItem onClick={() => {window.location = '/home/profile'}}>Profile</MenuItem>
                 <MenuItem onClick={logout}>{localStorage.getItem("user") ? 'Logout' : 'Login'}</MenuItem>
               </Menu>
             </div>
@@ -336,11 +350,15 @@ function ClippedDrawer(props) {
                     <Route path={`${path}/addproject`}>
                         <NewProject username={username}/>
                     </Route>
+                    <Route path={`${path}/mentors`}>
+                        <Mentors/>
+                    </Route>
                     <Route path={`${path}/profile`}>
                         <Profile/>
                     </Route>
                 </Switch>
             </main>
+            {showSearch && <h1>hello</h1>}
         </div>
     );
 }

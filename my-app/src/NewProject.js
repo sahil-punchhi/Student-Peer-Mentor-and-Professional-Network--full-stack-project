@@ -9,7 +9,10 @@ import Alert from "@material-ui/lab/Alert";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import {Book, Build, Create, Email, Timelapse, Timer} from "@material-ui/icons";
 import Skills from "./Skills";
+import Typography from '@material-ui/core/Typography';
 
+
+// Add project page
 class NewProject extends Component {
     constructor() {
         super();
@@ -60,6 +63,12 @@ class NewProject extends Component {
 
     render() {
         return (
+          <div>
+          <Typography variant="h4" component="h4">
+          Add a new project
+          </Typography>
+          <br></br>
+          <br></br>
             <React.Fragment>
                 <Grid container spacing={3}>
                     <Grid item xs={12} sm={6} md={3}>
@@ -171,6 +180,7 @@ class NewProject extends Component {
                     </Snackbar>
                 </Grid>
             </React.Fragment>
+            </div>
         )
     }
 }

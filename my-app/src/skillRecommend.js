@@ -1,3 +1,6 @@
+// Skill Recommendation Module
+// Screens user's profile with other users and projects and rcommends a skills
+// along with course links related to that skill
 import React from 'react';
 import { withStyles }  from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -6,6 +9,7 @@ import axios from 'axios';
 
 var  flag = false // console.log flag
 
+// styles used
 const useStyles = theme => ({
   root: {
     display: 'flex',
@@ -26,7 +30,7 @@ const useStyles = theme => ({
   },
 });
 
-
+// welcome text
 const WelcomeText = props => {
   return (
     <div style={{fontFamily: 'Roboto'}}>
@@ -47,23 +51,11 @@ const WelcomeText = props => {
   );
 }
 
-// const CourseButton = props => {
-//   return (
-//     <div style={{fontFamily: 'Roboto'}}>
-//       <Button onClick={props.addCourse} variant="contained" color="primary">
-//         WHERE CAN I LEARN THIS SKILL?
-//       </Button>
-//     </div>
-//   );
-// };
-
+// Skill component
 class Skill extends React.Component {
   constructor(props) {
       super(props);
 
-      // this.state = {
-      //     person_id: this.props.match.params.person_id
-      //   };
       this.state = {
           userData:{
               person_id: localStorage.getItem('user'),
@@ -108,24 +100,18 @@ class Skill extends React.Component {
       <h2 style={{color : '#3f51b5'}}>Recommended courses to learn this skill:</h2>
       {this.state.userData.course_list.map((item, index) => (
         <div>
-          <h3>&nbsp; {item.course_name} &nbsp; <a href={item.course_link}>course link</a></h3>
+        <h3>&nbsp; {item.course_name} &nbsp; <a href={item.course_link} target="_blank">course link</a></h3>
         </div>
       ))}
-
+      <br></br>
+      <br></br>
+      <a href={'/home/skillup'}> Not happy with the suggesstion? Check if there is any new suggestion!</a>
 
     </div>);
   }
 };
 
-// class Course extends React.Component {
-//   render() {
-//     return (
-//     <div style={{fontFamily: 'Avenir'}}>
-//       <h2>&nbsp; Lynda.com</h2>
-//     </div>);
-//   }
-// };
-
+// Skill Recommend component
 class SkillRecommend extends React.Component {
   constructor(props) {
      super(props);
@@ -140,14 +126,6 @@ class SkillRecommend extends React.Component {
     })
   }
 
-  triggerAddCourseState = () => {
-    this.setState({
-      ...this.state,
-      isEmpty2State: false,
-      isAddCourseState: true
-    })
-  }
-
   render() {
      const { classes } = this.props;
 
@@ -157,11 +135,6 @@ class SkillRecommend extends React.Component {
           {<WelcomeText addSkill={this.triggerAddSkillState} />}
           {this.state.isAddSkillState && <Skill />}
         </div>
-          // {this.state.isAddSkillState && <CourseButton addCourse={this.triggerAddCourseState} />}
-          // {this.state.isAddCourseState && <Course />}
-
-
-
   );
 }
 }
