@@ -1,4 +1,4 @@
-# Brighter Bee
+# Brighter Bee (Student, Peer, Mentor and Professional Network)
   
 This is a web app (formally known as 'For A Student') for professional development and professional connection for students.
 
